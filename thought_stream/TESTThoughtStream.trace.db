@@ -1,0 +1,6 @@
+2018-12-14 14:33:55 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Syntax error in SQL statement "SELECT AGGREGATEID FROM :[*]TEST_EMAILS WHERE EMAIL ='mela.nin@gmail.com' "; expected "identifier"; SQL statement:
+select aggregateid from :test_emails where email ='mela.nin@gmail.com' [42001-197]
+2018-12-14 14:41:12 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Data conversion error converting "clojure.lang.LazySeq@1"; SQL statement:
+select * from test_events where aggregateid ='clojure.lang.LazySeq@1' order by version [22018-197]
