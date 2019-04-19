@@ -12,19 +12,24 @@
 (deftest can-create-new-stream-with-focus-test
   (testing "Given uuid and focus as string."
     (let [id (new-uuid)
+          stream-name "text"
           focus-text "text"
-          stream (stream/new-stream id focus-text)]
+          stream (stream/new-stream id stream-name focus-text)]
       (is (= "text" (:focus stream)))
+      (is (= "text" (:name stream)))
       (is (= id (:id stream)))
     ))
   (testing "Given stream id is not a uuid throws AssertionError."
-    (is (thrown? AssertionError (stream/new-stream "id" "text")))
-    (is (thrown? AssertionError (stream/new-stream nil "text")))
-    (is (thrown? AssertionError (stream/new-stream 0 "text"))))
+    (is (thrown? AssertionError (stream/new-stream "id" "text" "text")))
+    (is (thrown? AssertionError (stream/new-stream nil "text" "text")))
+    (is (thrown? AssertionError (stream/new-stream 0 "text" "text"))))
   (testing "Given focus text is not a valid text string throw exception."
-    (is (thrown? AssertionError (stream/new-stream (new-uuid) 0)))
-    (is (thrown? AssertionError (stream/new-stream (new-uuid) nil)))
-    (is (thrown? AssertionError (stream/new-stream (new-uuid) [])))
+    (is (thrown? AssertionError (stream/new-stream (new-uuid) "text" 0)))
+    (is (thrown? AssertionError (stream/new-stream (new-uuid) "text" nil)))
+    (is (thrown? AssertionError (stream/new-stream (new-uuid) "text" [])))
+    )
+  (testing "Given stream name is not a valid text string throw exception."
+    (is (thrown? AssertionError (stream/new-stream (new-uuid) nil "text")))
     )
   )
 
@@ -41,13 +46,15 @@
 
 
 (deftest StreamCreated-record-test
-  (is (some? (stream/->StreamCreated nil nil)))
+  (is (some? (stream/->StreamCreated nil nil nil)))
   (is (extends? state/EventTransition thought_stream.thought_stream_logic.stream.StreamCreated))
   (let [stream-id (new-uuid)
         focus-text "text"
-        stream-created-event (stream/->StreamCreated stream-id focus-text)
+        stream-name "text"
+        stream-created-event (stream/->StreamCreated stream-id stream-name focus-text)
         transition-result (state/transition stream-created-event (mom/make-base-aggregate))]
     (is (= stream-id (:id transition-result)))
+    (is (= stream-name (:name transition-result)))
     (is (= focus-text (:focus transition-result)))
     (is (state/has-changes-queue? transition-result))
     ))

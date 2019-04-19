@@ -1,6 +1,7 @@
 (ns thought-stream.commands.have-thought
   (:require
     [thought-stream.thought-stream-logic.thought :as thought]
+    [thought-stream.commands.execution :as ex]
     [thought-stream.commands.config :as ccg]
     [thought-stream.state :as state]
     [thought-stream.utilities :as util]
@@ -81,5 +82,8 @@
 
 
 
-
+(defrecord HaveThought [id thinker thought link-url]
+  ex/ICommand
+  (ex/execute [command-input base-aggregate]
+    (have-thought base-aggregate command-input)))
 

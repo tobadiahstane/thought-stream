@@ -8,8 +8,9 @@
 
 (defn make-valid-stream []
   (let [id (new-uuid)
+        stream-name "text"
         focus-text "text"]
-    (stream/new-stream id focus-text)))
+    (stream/new-stream id stream-name focus-text)))
 
 
 (defn make-valid-thought []

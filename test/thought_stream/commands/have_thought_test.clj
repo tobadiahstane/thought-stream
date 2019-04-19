@@ -1,6 +1,7 @@
 (ns thought-stream.commands.have-thought-test
   (:require
-    [thought-stream.commands.have-thought :refer [have-thought]]
+    [thought-stream.commands.have-thought :as ht :refer [have-thought]]
+    [thought-stream.commands.execution :as ex :refer [ICommand]]
     [thought-stream.thought-stream-logic.thought :as thought]
     [thought-stream.commands.config :as ccg]
     [thought-stream.utilities :as util]
@@ -72,7 +73,7 @@
           (have-thought (mom/make-base-aggregate) {:id (util/new-uuid) :thinker (util/new-uuid) :thought "valid" :link-url 0})))))
 
 
-(deftest given-valid-arguments-if-thought-text-string-is-blank-throws-illegal-state-exception
+(deftest given-valid-arguments-if-thought-text-string-is-blank-throws-illegal-state-exception-test
   (testing "Empty string."
     (is (thrown-with-msg? IllegalStateException
           #"thought text outside expected bounds: text count 0"
@@ -111,13 +112,13 @@
 
 
 
-(deftest given-valid-arguments-if-thought-text-string-exceeds-maximum-text-string-length-throws-illegal-state-exception
+(deftest given-valid-arguments-if-thought-text-string-exceeds-maximum-text-string-length-throws-illegal-state-exception-test
   (testing "String length of 501 exceeds 500 string limit"
     (is (thrown-with-msg? IllegalStateException
           #"thought text outside expected bounds: text count 501"
           (have-thought (mom/make-base-aggregate) {:id (util/new-uuid) :thinker (util/new-uuid) :thought failing-string})))))
 
-(deftest given-valid-arguments-if-thought-text-string-within-bounds-return-thought-with-Thought-event
+(deftest given-valid-arguments-if-thought-text-string-within-bounds-return-thought-with-Thought-event-test
   (testing "String length of 1"
     (let [result  (have-thought (mom/make-base-aggregate) {:id (util/new-uuid) :thinker (util/new-uuid) :thought "A"})]
       (is (thought/valid-thought? result))
@@ -127,11 +128,22 @@
       (is (thought/valid-thought? result))
       (is (instance? thought_stream.thought_stream_logic.thought.Thought (first (:changes result)))))))
 
-(deftest given-valid-arguments-and-thought-within-bounds-if-valid-link-return-thought-with-Thought-and-UrlLinked-event
+(deftest given-valid-arguments-and-thought-within-bounds-if-valid-link-return-thought-with-Thought-and-UrlLinked-event-test
   (let [result (have-thought (mom/make-base-aggregate) {:id (util/new-uuid) :thinker (util/new-uuid) :thought "valid thought text" :link-url "someurl"})]
       (is (thought/valid-thought? result))
       (is (instance? thought_stream.thought_stream_logic.thought.UrlLinked (second (:changes result))))))
 
-(println (have-thought (mom/make-base-aggregate) {:id (util/new-uuid) :thinker (util/new-uuid) :thought "valid thought text" :link-url "someurl"}))
+
+(deftest HaveThought-command-record-test
+  (is (some? (ht/->HaveThought nil nil nil nil))))
+
+(deftest HaveThought-extends-ICommand-test
+  (is (extends? ICommand thought_stream.commands.have_thought.HaveThought)))
+
+(deftest calling-execute-on-have-thought-and-base-aggregate-calls-have-thought-with-arguments-test
+  (let [command (ht/map->HaveThought  {:id (util/new-uuid) :thinker (util/new-uuid) :thought "valid thought text" :link-url "someurl"})
+        result (ex/execute command (mom/make-base-aggregate))]
+    (is (thought/valid-thought? result))))
+
 
 (run-tests 'thought-stream.commands.have-thought-test)
