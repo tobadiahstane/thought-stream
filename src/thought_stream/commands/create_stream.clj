@@ -1,6 +1,7 @@
 (ns thought-stream.commands.create-stream
   (:require
     [thought-stream.thought-stream-logic.stream :as stream]
+    [thought-stream.commands.execution :as ex]
     [thought-stream.state :as state]
     [thought-stream.utilities :as util]
     [clojure.string :as s]))
@@ -24,4 +25,7 @@
 )
 
 
-(defrecord CreateStream [id name focus])
+(defrecord CreateStream [id name focus]
+  ex/ICommand
+  (ex/execute [stream-input base-aggregate]
+    (create-stream base-aggregate  stream-input)))

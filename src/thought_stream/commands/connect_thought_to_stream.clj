@@ -1,6 +1,7 @@
 (ns thought-stream.commands.connect-thought-to-stream
   (:require
     [thought-stream.thought-stream-logic.thought :as thought]
+    [thought-stream.commands.execution :as ex]
     [thought-stream.utilities :as util]
     [thought-stream.state :as state]))
 
@@ -20,3 +21,9 @@
     (throw (IllegalArgumentException. (str "Invalid stream id: " stream))))
   (let [thought-connected-event (thought/->ThoughtConnected (:id thought) (:connecting-to stream))]
     (state/update-state thought thought-connected-event)))
+
+
+(defrecord ConnectThoughtToStream [id connecting-to]
+  ex/ICommand
+  (ex/execute [connecting-input thought-aggregate]
+    (connect-thought-to-stream thought-aggregate connecting-input)))

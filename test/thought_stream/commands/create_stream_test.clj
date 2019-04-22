@@ -2,6 +2,7 @@
   (:require
     [thought-stream.commands.create-stream :as cs :refer [create-stream]]
     [thought-stream.thought-stream-logic.stream :as stream]
+    [thought-stream.commands.execution :as ex :refer [ICommand]]
     [thought-stream.test-mother :as mom]
     [thought-stream.utilities :as util]
     [clojure.test :refer :all]))
@@ -49,4 +50,17 @@
 
 (deftest CreateStream-record-test
   (is (some? (cs/->CreateStream nil nil nil))))
+
+(deftest CreateStream-record-extends-ICommand-test
+  (is (extends? ICommand thought_stream.commands.create_stream.CreateStream)))
+
+(deftest executing-CreateStream-creates-new-stream-test
+  (let [stream-input (cs/->CreateStream (util/new-uuid) "some name" "some text")
+        result (ex/execute stream-input (mom/make-base-aggregate))]
+    (is (= (:id stream-input) (:id result)))
+    (is (= (:focus stream-input) (:focus result)))
+    (is (instance? thought_stream.thought_stream_logic.stream.StreamCreated (first (:changes result))))))
+
+
+
 (run-tests 'thought-stream.commands.create-stream-test)

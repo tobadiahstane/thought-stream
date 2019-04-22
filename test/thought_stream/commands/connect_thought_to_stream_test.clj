@@ -1,6 +1,7 @@
 (ns thought-stream.commands.connect-thought-to-stream-test
   (:require
-    [thought-stream.commands.connect-thought-to-stream :refer [connect-thought-to-stream]]
+    [thought-stream.commands.connect-thought-to-stream :as cts :refer [connect-thought-to-stream]]
+    [thought-stream.commands.execution :as ex :refer [ICommand]]
     [thought-stream.thought-stream-logic.thought :as thought]
     [thought-stream.test-mother :as mom]
     [clojure.test :refer :all]))
@@ -33,5 +34,20 @@
         result (connect-thought-to-stream thought-aggregate stream)]
     (is (thought/valid-thought? result))
     (is (instance? thought_stream.thought_stream_logic.thought.ThoughtConnected (first (:changes result))))))
+
+(deftest ConnectThoughtToStream-record-test
+  (is (some? (cts/->ConnectThoughtToStream nil nil))))
+
+(deftest ConnectThoughtToStream-extends-ICommand-test
+  (is (extends? ICommand thought_stream.commands.connect_thought_to_stream.ConnectThoughtToStream)))
+
+(deftest ConnectThoughtToStream-execution-test
+  (let [thought-aggregate (mom/as-aggregate (mom/make-valid-thought))
+        connect-to-stream (mom/make-valid-stream)
+        connecting-input (cts/->ConnectThoughtToStream (:id thought-aggregate) (:id connect-to-stream))
+        result (ex/execute connecting-input thought-aggregate)]
+    (is (thought/valid-thought? result))
+    (is (instance? thought_stream.thought_stream_logic.thought.ThoughtConnected (first (:changes result))))))
+
 
 (run-tests 'thought-stream.commands.connect-thought-to-stream-test)
