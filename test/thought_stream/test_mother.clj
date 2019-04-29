@@ -25,3 +25,5 @@
       (assoc :expected-version 1)))
 
 
+(defn make-valid-new-thinker-input []
+  {:id (new-uuid) :thinker-username "testThinker" :thinker-password "test234"})
